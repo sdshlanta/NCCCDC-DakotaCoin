@@ -2,18 +2,52 @@
 {{super()}}
 {% block title %}Mt. CCDC - {{ account }}'s account {% endblock %}
 {% block content %}
-<table>
+<table border="1">
     <tr>
         <th>Addresses</th>
     </tr>
-    {% for address, amountrecived in addresses %}
+    {% for address in addresses %}
     <tr>
         <td>
-            
+            {{ address }}
         </td>
     </tr>
     {% endfor %}
 </table>
+<h2>Transactions</h2>
+<table border="1">
+        <tr>
+            <th>Transaction ID</th><th>Sent To</th><th>Amount</th><TH>Time Sent</TH><th>Message</th><th>Sent</th><th>Cancled</th><th>failed</th>
+        </tr>
+        {% for txid, userId, sentTo, amount, message, timeSent, sent, cancled, failed  in transactions %}
+        <tr>
+            <td>
+                {{ txid }}
+            </td>
+            <td>
+                {{ sentTo }}
+            </td>
+            <td>
+                {{ amount }} DAK
+            </td>
+            <td>
+                {% if timeSent %} {{timeSent}} {% else %} Not Yet Sent {% endif %}
+            </td>
+            <td>
+                {{ message }}
+            </td>
+            <td>
+                {{ sent }}
+            </td>
+            <td>
+                {{ cancled }}
+            </td>
+            <td>
+                {{ failed }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
 
 {% endblock %}

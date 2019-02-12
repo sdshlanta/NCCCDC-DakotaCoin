@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import sched
@@ -10,12 +11,13 @@ from pprint import pprint
 from time import strftime, sleep
 from flask_simpleldap import LDAP
 from logging.handlers import RotatingFileHandler
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for, send_from_directory
 
 import dakDB
 import dakRPC
 
 app = Flask(__name__)
+
 
 app.config['LDAP_HOST'] = 'dc01'
 app.config['LDAP_USERNAME'] = 'cn=Administrator,CN=Users,DC=ccdc,DC=local'
@@ -57,6 +59,11 @@ def authenticate(username, password):
     # return ldap.bind_user(username, password)
     return db.checkUserCreds(username, password)
 
+@app.before_request
+def before():
+    if 'logged_in' not in session:
+        session['logged_in'] = False
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     error = None
@@ -70,7 +77,7 @@ def index():
             else:
                 error = 'Invalid Username or Password'
     
-    if 'logged_in' in session:
+    if session['logged_in']:
         userInfo = db.getUserByName(session['username'])
         userInfo['balance'] = rpc.getBalance(session['username'])
         userInfo['error'] = error
@@ -79,12 +86,21 @@ def index():
 
 @app.route('/account/<username>')
 def account(username):
-    pprint(rpc.getBalance(username))
-    return username
+    error = None
+    if not session['logged_in']:
+        userInfo = db.getUserByName(session['username'])
+        userInfo['balance'] = rpc.getBalance(session['username'])
+        userInfo['error'] = error
+    else:
+        userInfo = {}
+    userInfo['addresses'] = rpc.getAllAccountAddresses(username)
+    userInfo['transactions'] = db.getTransactions(userInfo['id'])
+    return render_template('account.html', **userInfo)
+    
 
 @app.route('/send', methods=['GET', 'POST'])
 def send():
-    if 'logged_in' not in session:
+    if not session['logged_in']:
         redirect(url_for('index'))
 
     ballance = rpc.getBalance(session['username'])
@@ -142,7 +158,7 @@ def register():
             return redirect(url_for('account', username=session['username']))
         else:
             error = "Username already registerd"
-    if 'username' in session:
+    if session['logged_in']:
         return redirect(url_for('index'))
 
     return render_template('register.html', error=error)
@@ -150,7 +166,7 @@ def register():
 @app.route('/logout', methods=['GET'])
 def logout():
     if 'logged_in' in session:
-        del session['logged_in']
+        session['logged_in'] = False
     if 'username' in session:
         del session['username']
     return redirect(url_for('index'))
@@ -186,6 +202,10 @@ def logExceptions(e):
         tb)
     return "Internal Server Error", 500
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('Mt. CCDC Crypto exchange backend')
     parser.add_argument('ConfigFile', type=str, help='File containing inital configureation information')
@@ -231,4 +251,5 @@ if __name__ == "__main__":
     # code.interact(local=locals())
 
     app.secret_key = config['webAppSessionSecretKey']
+
     app.run(debug=True)
