@@ -27,7 +27,6 @@ CREATE TABLE users (
 	,user_name varchar(100) NOT NULL
 	,user_password varchar(100) NOT NULL
 	,user_email varchar(100) NOT NULL
-	,softDAK float NOT NULL
 );
 
 CREATE TABLE transactions (
@@ -81,11 +80,11 @@ CREATE VIEW cancled_transactions AS
 	WHERE cancled = 1;
 GO
 
-INSERT users VALUES ('mike', 'test', 'A', 0),
-					('eric', 'fish_are_hot', 'B', 0),
-					('andrew', 'Password1!', 'C' ,0),
-					('dyl_up', 'r00M#Gb4p%ur', 'myspamcondom@gmail.com', 0),
-					('test2', 'UvT$yRs8PfO8', 'myspamcondom2@gmail.com', 0);
+INSERT users VALUES ('mike', 'test', 'A'),
+					('eric', 'fish_are_hot', 'B'),
+					('andrew', 'Password1!', 'C'),
+					('dyl_up', 'r00M#Gb4p%ur', 'myspamcondom@gmail.com'),
+					('test2', 'UvT$yRs8PfO8', 'myspamcondom2@gmail.com');
 
 INSERT configs VALUES ('admin', 'password1!', 'username', 'password', '192.168.80.160', 9332, 60),
 					  ('admin', 'Password1!', 'username', 'password', '192.168.80.160', 9332, 5);
