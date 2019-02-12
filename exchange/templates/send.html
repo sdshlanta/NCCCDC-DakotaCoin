@@ -1,0 +1,43 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC{% endblock %}
+{% block content %}
+<form action="/send", method="POST">
+    <table>
+        <tr>
+            <th>Send DakotaCoin!</th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label for="toAddress">Send To:</label>
+                <input type="text" name="toAddress" id="toAddress">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label for="message">Message:</label>
+                <input type="text" name="message" id="message">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="amount">Amount:</label>
+                <input type="number" name="amount" id="amount">
+            </td>
+            <td>
+                <select name="unit" id="unit">
+                    <option value="1">Dak</option>
+                    <option value="0.001">mDak</option>
+                    <option value="0.000001">μDak</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit" value="Send">
+            </td>
+        </tr>
+    </table>
+</form>
+
+{% endblock %}

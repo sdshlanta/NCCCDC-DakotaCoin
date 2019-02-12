@@ -10,7 +10,7 @@ from pprint import pprint
 from time import strftime, sleep
 from flask_simpleldap import LDAP
 from logging.handlers import RotatingFileHandler
-from flask import Flask, g, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for
 
 import dakDB
 import dakRPC
@@ -66,13 +66,15 @@ def index():
             if authenticate(form['username'], form['password']):
                 session['logged_in'] = True
                 session['username'] = form['username']
-                g.user = form['username']
+                session['userid'] = db.getUserByName(form['username'])['id']
             else:
                 error = 'Invalid Username or Password'
-    else:
-        if 'logged_in' in session:
-            userInfo = db.getUserByName(session['username'])
-            return render_template('index.html', **userInfo)
+    
+    if 'logged_in' in session:
+        userInfo = db.getUserByName(session['username'])
+        userInfo['balance'] = rpc.getBalance(session['username'])
+        userInfo['error'] = error
+        return render_template('index.html', **userInfo)
     return render_template('index.html', error=error)
 
 @app.route('/account/<username>')
@@ -80,9 +82,45 @@ def account(username):
     pprint(rpc.getBalance(username))
     return username
 
-# @app.route('/send', methods=['GET', 'POST'])
-# def send():
-#     if request.method == 'POST':
+@app.route('/send', methods=['GET', 'POST'])
+def send():
+    if 'logged_in' not in session:
+        redirect(url_for('index'))
+
+    ballance = rpc.getBalance(session['username'])
+    error = None
+    
+    if request.method == 'POST':
+        toAddress = request.form['toAddress']
+        amount = float(request.form['amount'])
+        message = request.form['message']
+        unit = float(request.form['unit'])
+        amount *= unit
+        addrInfo = rpc.getAddressInfo(toAddress)
+        if addrInfo['isvalid']:
+            if addrInfo['ismine']:
+                if ballance >= amount:
+                    db.createTransaction(session['userid'], toAddress, amount, message)
+                else:
+                    error = "Insufficient Funds to send %f DAK" % amount
+            else:
+                if ballance >= amount + 0.02:
+                    db.createTransaction(session['userid'], toAddress, amount, message)                   
+                else:
+                    error = "Insufficient Funds to send %f DAK.  Please keep in mind the 0.02 DAK network fee to transfer out of MT. CCDC" % amount
+        elif db.checkForExistingUser(toAddress):
+            toAddress = rpc.getAddress(toAddress)
+            if ballance >= amount:
+                db.createTransaction(session['userid'], toAddress, amount, message)
+            else:
+                error = "Insufficient Funds to send %f DAK" % amount
+        else:
+            error = "%s is an invalid DakotaCoin address"
+
+    userInfo = db.getUserByName(session['username'])
+    userInfo['balance'] = ballance
+    userInfo['error'] = error
+    return render_template('send.html', **userInfo)
         
 
 @app.route('/register', methods=['GET', 'POST'])
