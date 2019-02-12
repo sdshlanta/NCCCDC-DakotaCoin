@@ -1,0 +1,9 @@
+Building DakotaCoin
+
+See doc/readme-qt.rst for instructions on building DakotaCoin-Qt,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of DakotaCoin.
+
+See doc/build-*.txt for instructions on building dakotacoind,
+the intended-for-services, no-graphical-interface, reference
+implementation of DakotaCoin.

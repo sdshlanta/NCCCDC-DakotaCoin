@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+	</head>
+	<body>
+		<div id="header">
+			<div id="title">
+				<a href="{{ url_for('index') }}"><h1>Mt. CCDC</h1></a>
+				<h3>DakotaCoin Exchange</h3>
+			</div>
+			{% if session.logged_in %}
+				<div id="logout">
+					<p>
+						<table>
+							<tr>
+								<td>
+									Welcome {{ session.username }}! 
+								</td>
+								<td>
+									DAK: {% if softDAK %}{{ softDAK }} {% else %} 0 {% endif %}
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="{{ url_for('logout') }}">Logout</a>
+								</td>
+								<td>
+									<a href="{{ url_for('account', username=session.username) }}">Account</a>
+								</td>
+							</tr>
+							
+						</table>
+						
+					</p>
+				</div>
+			{% else %}
+				<div>
+					<form method="POST" action="{{ url_for('index') }}">
+					<table id="loginForm">
+						<tr>
+							<td colspan="2">
+								<input type="text" name="username" id="username">
+							</td>							
+						</tr>
+						<tr>
+							<td colspan="2">
+								<input type="password" name="password" id="password">						
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<button type="submit">Login</button>
+                            </td>
+                            <td>
+                                <button type="submit" formaction="{{ url_for('register') }}">Register</button>
+                            </td>
+						</tr>
+						{% if error %}
+						<tr>
+							<td colspan="2">
+								<div id="error">{{ error }}</div>
+							</td>
+						</tr>
+						{% endif %}
+					</table>
+					</form>
+				</div>
+			{% endif %}
+			<hr>
+		</div>
+		<div id="content">{% block content %}{% endblock %}</div>
+	</body>
+</html>

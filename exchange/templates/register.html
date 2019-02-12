@@ -1,0 +1,39 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - New User Registration{% endblock %}
+{% block content %}
+<form method="POST" action="{{ url_for('register') }}">
+    <table>
+        <tr>
+            <td>
+                <label for="NewUsername">Username</label>
+                <input name="NewUsername" type="text">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="NewPassword" >Password</label>
+                <input name="NewPassword" type="password">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="email" >Email</label>
+                <input name="email" type="email">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button type="submit">Submit</button>
+            </td>
+        </tr>
+        {% if error %}
+        <tr>
+            <td>
+                <div id="error">{{ error }}</div>
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+</form>
+{% endblock %}

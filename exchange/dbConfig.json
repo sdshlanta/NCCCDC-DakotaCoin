@@ -1,0 +1,10 @@
+{
+    "dbHost":"MSI"
+    ,"dbDatabase":"exchange"
+    ,"dbUser":"webApp"
+    ,"dbPassword":"password"
+    ,"webAppSessionSecretKey":"changeme"
+    ,"logFile":"exchange.log"
+    ,"logMaxBytes":100000
+    ,"logBackups":1
+}

@@ -1,0 +1,19 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - {{ account }}'s account {% endblock %}
+{% block content %}
+<table>
+    <tr>
+        <th>Addresses</th>
+    </tr>
+    {% for address, amountrecived in addresses %}
+    <tr>
+        <td>
+            
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
