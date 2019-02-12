@@ -35,6 +35,7 @@ CREATE TABLE transactions (
 	,toAddress char(34) NOT NULL
 	,amount float NOT NULL
 	,message varchar(1024) NOT NULL
+	,timeSent datetime
 	,sent bit NOT NULL DEFAULT 0
 	,cancled bit NOT NULL DEFAULT 0
 	,failed bit NOT NULL DEFAULT 0
@@ -89,8 +90,8 @@ INSERT users VALUES ('mike', 'test', 'A'),
 INSERT configs VALUES ('admin', 'password1!', 'username', 'password', '192.168.80.160', 9332, 60),
 					  ('admin', 'Password1!', 'username', 'password', '192.168.80.160', 9332, 5);
 
-INSERT INTO transactions VALUES (5, 'tAGRGCq7jEzkgAi4B2vJam4T5q8yHNczvX', 0.1, '', 0, 0, 0),
-								(5, 'tGTAR2yw5jRWTcdv26s4MqsR55c85T51GV', 0.1, '', 0, 0, 0);
+INSERT INTO transactions VALUES (5, 'tAGRGCq7jEzkgAi4B2vJam4T5q8yHNczvX', 0.1, '', NULL, 0, 0, 0),
+								(5, 'tGTAR2yw5jRWTcdv26s4MqsR55c85T51GV', 0.1, '', NULL, 0, 0, 0);
 
 SELECT * FROM users;
 SELECT * FROM configs;
