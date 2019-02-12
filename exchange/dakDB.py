@@ -29,7 +29,7 @@ class DakDb(object):
         return dbConn
 
     def createUser(self, username, password, email):
-        insertionQuery = "INSERT INTO users  VALUES (?, ?, ?, 0)"
+        insertionQuery = "INSERT INTO users  VALUES (?, ?, ?)"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
         cur.execute(insertionQuery, (username, password, email))
@@ -126,3 +126,11 @@ class DakDb(object):
         dbConn.close()
         return rows
 
+    def createTransaction(self, userId, toAddress, amount, message):
+        insertionQuery = "INSERT INTO transactions VALUES (?, ?, ?, ?, 0, 0, 0)"
+        dbConn = self._getDatabaseConnection()
+        cur = dbConn.cursor()
+        cur.execute(insertionQuery, (userId, toAddress, amount, message))
+        dbConn.commit()
+        cur.close()
+        dbConn.close()
