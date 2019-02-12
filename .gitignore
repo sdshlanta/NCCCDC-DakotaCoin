@@ -1,3 +1,4 @@
 .out
 .pyc
-exchange/exchange.log
+*.log
+*.pyc
