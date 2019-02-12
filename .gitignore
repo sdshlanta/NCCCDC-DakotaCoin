@@ -2,3 +2,5 @@
 .pyc
 *.log
 *.pyc
+exchange/__pycache__/dakDB.cpython-35.pyc
+exchange/__pycache__/dakRPC.cpython-35.pyc

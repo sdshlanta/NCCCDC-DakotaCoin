@@ -22,11 +22,15 @@ class dakRpc():
     
     def getBalance(self, account):
         balance = self.rpc.getbalance(account)
-        return balance
+        return float(balance)
 
     def getTransactions(self, account, start=0, end=10):
         transactions = self.rpc.listtransactions(account, start, end)
         return transactions
+
+    def getAddress(self, account):
+        address = self.rpc.getaccountaddress(account)
+        return address
 
     def getAccountByAddress(self, address):
         try:
@@ -44,4 +48,5 @@ class dakRpc():
         else:
             self.rpc.sendfrom(fromAccount, toAddress, amount, 1, message)
 
-    # def isValidAddress()
+    def getAddressInfo(self, address):
+        return self.rpc.validateaddress(address)
