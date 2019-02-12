@@ -108,7 +108,7 @@ class DakDb(object):
         return rows
 
     def markTransactionsAsSent(self, txids):
-        updateQuery = "UPDATE transactions SET sent=1 WHERE txid = ?"
+        updateQuery = "UPDATE transactions SET sent=1, timeSent=GETDATE() WHERE txid = ?"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
         cur.executemany(updateQuery, ((txid, ) for txid in txids))
@@ -120,14 +120,14 @@ class DakDb(object):
         selectQuery = "SELECT * FROM transactions WHERE userid = ?"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
-        cur.execute(selectQuery)
-        rows = [{column[0]:rowElement for column, rowElement in zip (cur.description, row)} for row in cur]
+        cur.execute(selectQuery, userid)
+        rows = [row for row in cur]
         cur.close()
         dbConn.close()
         return rows
 
     def createTransaction(self, userId, toAddress, amount, message):
-        insertionQuery = "INSERT INTO transactions VALUES (?, ?, ?, ?, 0, 0, 0)"
+        insertionQuery = "INSERT INTO transactions VALUES (?, ?, ?, ?, NULL, 0, 0, 0)"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
         cur.execute(insertionQuery, (userId, toAddress, amount, message))
