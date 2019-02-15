@@ -51,9 +51,10 @@
         </td>
     </tr>
     {% endfor %}
-    {% if user_name == pathUsername %}
-        <a href="/account/{{ user_name }}/resetpassword">Change Password</a>
-    {% endif %}
 </table>
+
+{% if user_name == pathUsername %}
+    <a href="/account/{{ user_name }}/resetpassword">Change Password</a>
+{% endif %}
 
 {% endblock %}
