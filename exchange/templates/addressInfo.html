@@ -1,0 +1,50 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - Address Info{% endblock %}
+{% block content %}
+
+{% if not isvalid %}
+    {{ address }} is not a valid DakotaCoin address.{{isvalid}}
+{% else %}
+{% if not ismine %}
+    {{ address }} is a valid DakotaCoin address, but is not part of this exchange
+{% else %}
+    {{ address }} is a valid DakotaCoin address and is part of this exchange.
+    <table>
+        <tr>
+            <th>Account:</th>
+            <td>
+                <a href="{{ url_for('accountInfo', username=account) }}">{{ account }}</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Amount Received:</th>
+            <td>{{ amountRecv }} DAK</td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <th>
+                Transactions
+            </th>
+        </tr>
+        {% if txids %}
+        {% for txid in txids %}
+        <tr>
+            <td>
+                <a href="{{url_for('transactionInfo', txid=txid)}}">{{ txid }}</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td>
+                This account has received no transactions
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+{% endif %}
+{% endif %}
+
+{% endblock %}

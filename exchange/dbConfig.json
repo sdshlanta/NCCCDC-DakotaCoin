@@ -7,4 +7,9 @@
     ,"logFile":"exchange.log"
     ,"logMaxBytes":100000
     ,"logBackups":1
+    ,"ldapHost":"dc01.ccdc.local"
+    ,"ldapUser":"ccdc\\Administrator"
+    ,"ldapPassword":"Password1!"
+    ,"ldapBaseDN":"CN=Users,DC=ccdc,DC=local"
+    ,"domain":"ccdc.local"
 }

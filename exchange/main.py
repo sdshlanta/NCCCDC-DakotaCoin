@@ -2,19 +2,18 @@ import os
 import sys
 import json
 import sched
-import ldap3
 import logging
 import argparse
 import traceback
-from multiprocessing import Process
 from pprint import pprint
 from time import strftime, sleep
-from flask_simpleldap import LDAP
+from multiprocessing import Process
 from logging.handlers import RotatingFileHandler
 from flask import Flask, redirect, render_template, request, session, url_for, send_from_directory
 
 import dakDB
 import dakRPC
+import dakLDAP
 
 app = Flask(__name__)
 
@@ -23,41 +22,38 @@ app.config['LDAP_HOST'] = 'dc01'
 app.config['LDAP_USERNAME'] = 'cn=Administrator,CN=Users,DC=ccdc,DC=local'
 app.config['LDAP_PASSWORD'] = 'Password1!'
 app.config['LDAP_BASE_DN'] = 'CN=Users,DC=ccdc,DC=local'
-app.config['LDAP_USER_OBJECT_FILTER'] = '(&(objectclass=person)(cn=%s))'
-
-ldap = LDAP(app)
 
 def processTransactions(db, rpc, logger, delay):
     while True:
         txs = db.getUnsetTransactions()
         sent = []
-        # import code
-        # code.interact(local=locals())
         for tx in txs:
-            # try:
-            rpc.send(tx['user_name'], tx['toAddress'], tx['amount'], tx['message'])
-            sent.append(tx['txid'])
-            # except Exception as e:
-            #     ts = strftime('[%Y-%b-%d %H:%M]')
-            #     tb = traceback.format_exc()
-            #     logger.error('%s %s %s %s DAKRPC ERROR IN SENDING\n%s',
-            #         ts,
-            #         tx['txid'],
-            #         tx['toAddress'],
-            #         tx['user_name'],
-            #         tb)
+            try:
+                daktxid = rpc.send(tx['user_name'], tx['toAddress'], tx['amount'], tx['message'])
+                sent.append((daktxid, tx['txid']))
+            except Exception as _:
+                ts = strftime('[%Y-%b-%d %H:%M]')
+                tb = traceback.format_exc()
+                logger.error('%s %s %s %s DAKRPC ERROR IN SENDING\n%s',
+                    ts,
+                    tx['txid'],
+                    tx['toAddress'],
+                    tx['user_name'],
+                    tb)
         if any(sent):
             db.markTransactionsAsSent(sent)
         sleep(delay)
 
 
 def registerUser(username, password, email):
-    db.createUser(username, password, email)
+    db.createUser(username, email)
     rpc.addNewAccount(username)
+    ldapAuth.createUser(username, password)
 
 def authenticate(username, password):
-    # return ldap.bind_user(username, password)
-    return db.checkUserCreds(username, password)
+    if db.checkForExistingUser(username):
+        return ldapAuth.checkUserCreds(username, password)
+    return False
 
 @app.before_request
 def before():
@@ -82,21 +78,81 @@ def index():
         userInfo['balance'] = rpc.getBalance(session['username'])
         userInfo['error'] = error
         return render_template('index.html', **userInfo)
-    return render_template('index.html', error=error)
+    return render_template('index.html', loginError=error)
+
+@app.route('/account', methods=['GET', 'POST'])
+def accountSearch():
+    error = None
+    if request.method == 'POST':
+        form = request.form
+        return redirect(url_for('accountInfo', username=form['accountName']))
+    
+    userInfo = {}
+    if session['logged_in']:
+        userInfo = db.getUserByName(session['username'])
+        userInfo['balance'] = rpc.getBalance(session['username'])
+    userInfo['error'] = error
+    return render_template('accountSearch.html', **userInfo)
 
 @app.route('/account/<username>')
-def account(username):
+def accountInfo(username = None):
     error = None
-    if not session['logged_in']:
+    
+    try:
+        userInfo = db.getUserByName(username)
+        userInfo['pathUsername'] = username
+        userInfo['addresses'] = rpc.getAllAccountAddresses(username)
+    except IndexError:
+        error = 'The user "%s" does not exist' % username
+        userInfo = {'addresses':[None]}
+    if session['logged_in']:
+        userInfo['balance'] = rpc.getBalance(session['username'])
+    try:
+        userInfo['transactions'] = db.getTransactions(userInfo['id'])
+    except KeyError:
+        error = 'The user "%s" does not exist' % username
+        userInfo['transactions'] = []
+    userInfo['error'] = error
+
+    return render_template('account.html', **userInfo)
+
+@app.route('/account/<username>/resetpassword', methods=['GET', 'POST'])
+def resetPassword(username):
+    if session['logged_in']:
+        error = None
+        if request.method == 'POST':
+            form = request.form
+            if form['newPassword']:
+                ldapAuth.changePassword(username, form['newPassword'])
+            else:
+                error = "Please provide a new password."
         userInfo = db.getUserByName(session['username'])
         userInfo['balance'] = rpc.getBalance(session['username'])
         userInfo['error'] = error
-    else:
-        userInfo = {}
-    userInfo['addresses'] = rpc.getAllAccountAddresses(username)
-    userInfo['transactions'] = db.getTransactions(userInfo['id'])
-    return render_template('account.html', **userInfo)
-    
+        return render_template('resetPassword.html', **userInfo)
+
+@app.route('/addressinfo/<address>')
+def addressInfo(address):
+    error = None
+    addrInfo = rpc.getAddressInfo(address)   
+    addrInfo['address'] = address
+    if addrInfo['isvalid']:
+        addrTXInfo = rpc.getAddressTransactionInfo(address)
+        if addrTXInfo is not None:
+            addrInfo['amountRecv'] = float(addrTXInfo['amount'])
+            addrInfo['txids'] = addrTXInfo['txids']
+        else:
+            addrInfo['amountRecv'] = 0.0
+    if session['logged_in']:
+        userInfo = db.getUserByName(session['username'])
+        userInfo['balance'] = rpc.getBalance(session['username'])
+        userInfo['error'] = error
+        addrInfo.update(userInfo)
+    return render_template('addressInfo.html', **addrInfo)
+
+@app.route('/transactionInfo/<txid>')
+def transactionInfo(txid):
+    return txid
 
 @app.route('/send', methods=['GET', 'POST'])
 def send():
@@ -152,10 +208,10 @@ def register():
             )
 
             session['username'] = username
-            session['userid'] = db.getUserByName(username)['userid']
+            session['userid'] = db.getUserByName(username)['id']
             session['logged_in'] = True
 
-            return redirect(url_for('account', username=session['username']))
+            return redirect(url_for('accountInfo', username=session['username']))
         else:
             error = "Username already registerd"
     if session['logged_in']:
@@ -249,6 +305,7 @@ if __name__ == "__main__":
     # processTransactions(db, rpc, logger, s)
     # import code
     # code.interact(local=locals())
+    ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'])
 
     app.secret_key = config['webAppSessionSecretKey']
 

@@ -1,53 +1,59 @@
 {% extends "header.html" %}
 {{super()}}
-{% block title %}Mt. CCDC - {{ account }}'s account {% endblock %}
+{% block title %}Mt. CCDC - {{ user_name }}'s account{% endblock %}
 {% block content %}
+{% if error %}
+    <h1>{{ error }}</h1>
+{% endif %}
+<h1>
+    {{ user_name }}'s Account
+</h1>
+<h2>Addresses</h2>
 <table border="1">
-    <tr>
-        <th>Addresses</th>
-    </tr>
     {% for address in addresses %}
     <tr>
         <td>
-            {{ address }}
+            <a href="{{url_for('addressInfo', address=address)}}">{{ address }}</a>
         </td>
     </tr>
     {% endfor %}
 </table>
 <h2>Transactions</h2>
 <table border="1">
-        <tr>
-            <th>Transaction ID</th><th>Sent To</th><th>Amount</th><TH>Time Sent</TH><th>Message</th><th>Sent</th><th>Cancled</th><th>failed</th>
-        </tr>
-        {% for txid, userId, sentTo, amount, message, timeSent, sent, cancled, failed  in transactions %}
-        <tr>
-            <td>
-                {{ txid }}
-            </td>
-            <td>
-                {{ sentTo }}
-            </td>
-            <td>
-                {{ amount }} DAK
-            </td>
-            <td>
-                {% if timeSent %} {{timeSent}} {% else %} Not Yet Sent {% endif %}
-            </td>
-            <td>
-                {{ message }}
-            </td>
-            <td>
-                {{ sent }}
-            </td>
-            <td>
-                {{ cancled }}
-            </td>
-            <td>
-                {{ failed }}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
+    <tr>
+        <th>Transaction ID</th><th>Sent To</th><th>Amount</th><TH>Time Sent</TH><th>Message</th><th>Sent</th><th>Cancled</th><th>failed</th>
+    </tr>
+    {% for txid, userId, sentTo, amount, message, timeSent, sent, cancled, failed  in transactions %}
+    <tr>
+        <td>
+            {{ txid }}
+        </td>
+        <td>
+            {{ sentTo }}
+        </td>
+        <td>
+            {{ amount }} DAK
+        </td>
+        <td>
+            {% if timeSent %} {{timeSent}} {% else %} Not Yet Sent {% endif %}
+        </td>
+        <td>
+            {{ message }}
+        </td>
+        <td>
+            {{ sent }}
+        </td>
+        <td>
+            {{ cancled }}
+        </td>
+        <td>
+            {{ failed }}
+        </td>
+    </tr>
+    {% endfor %}
+    {% if user_name == pathUsername %}
+        <a href="/account/{{ user_name }}/resetpassword">Change Password</a>
+    {% endif %}
+</table>
 
 {% endblock %}

@@ -11,7 +11,7 @@ class DakDb(object):
         self._getDatabaseConnection()
     
     def _getDatabaseConnection(self, retries=10):
-        for x in range(retries):
+        for _ in range(retries):
             try:
                 # dbConn = dbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=MSI;DATABASE=exchange;UID=webApp;PWD=Password1!')
                 dbConn = dbc.connect(driver='ODBC Driver 17 for SQL Server'
@@ -28,11 +28,11 @@ class DakDb(object):
             raise dbc.InterfaceError()
         return dbConn
 
-    def createUser(self, username, password, email):
-        insertionQuery = "INSERT INTO users  VALUES (?, ?, ?)"
+    def createUser(self, username, email):
+        insertionQuery = "INSERT INTO users  VALUES (?, ?)"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
-        cur.execute(insertionQuery, (username, password, email))
+        cur.execute(insertionQuery, (username, email))
         dbConn.commit()
         cur.close()
         dbConn.close()
@@ -108,10 +108,10 @@ class DakDb(object):
         return rows
 
     def markTransactionsAsSent(self, txids):
-        updateQuery = "UPDATE transactions SET sent=1, timeSent=GETDATE() WHERE txid = ?"
+        updateQuery = "UPDATE transactions SET daktxid=?, sent=1, timeSent=GETDATE() WHERE txid = ?"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
-        cur.executemany(updateQuery, ((txid, ) for txid in txids))
+        cur.executemany(updateQuery, txids)
         dbConn.commit()
         cur.close()
         dbConn.close()

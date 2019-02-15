@@ -1,3 +1,8 @@
+--ALTER LOGIN webApp ENABLE ;
+--GO
+--ALTER LOGIN webApp WITH PASSWORD = 'password' ;  
+--GO  
+
 USE exchange;
 GO
 DROP TABLE IF EXISTS [dbo].[dakotacoinAccounts];
@@ -25,7 +30,6 @@ GO
 CREATE TABLE users (
 	id int NOT NULL IDENTITY PRIMARY KEY
 	,user_name varchar(100) NOT NULL
-	,user_password varchar(100) NOT NULL
 	,user_email varchar(100) NOT NULL
 );
 
@@ -36,6 +40,7 @@ CREATE TABLE transactions (
 	,amount float NOT NULL
 	,message varchar(1024) NOT NULL
 	,timeSent datetime
+	,daktxid varchar(64)
 	,sent bit NOT NULL DEFAULT 0
 	,cancled bit NOT NULL DEFAULT 0
 	,failed bit NOT NULL DEFAULT 0
@@ -81,17 +86,17 @@ CREATE VIEW cancled_transactions AS
 	WHERE cancled = 1;
 GO
 
-INSERT users VALUES ('mike', 'test', 'A'),
-					('eric', 'fish_are_hot', 'B'),
-					('andrew', 'Password1!', 'C'),
-					('dyl_up', 'r00M#Gb4p%ur', 'myspamcondom@gmail.com'),
-					('test2', 'UvT$yRs8PfO8', 'myspamcondom2@gmail.com');
+INSERT users VALUES ('mike' , 'A'),
+					('eric', 'B'),
+					('andrew', 'C'),
+					('dyl_up', 'myspamcondom@gmail.com'),
+					('test2', 'myspamcondom2@gmail.com');
 
 INSERT configs VALUES ('admin', 'password1!', 'username', 'password', '192.168.80.160', 9332, 60),
 					  ('admin', 'Password1!', 'username', 'password', '192.168.80.160', 9332, 5);
 
-INSERT INTO transactions VALUES (5, 'tAGRGCq7jEzkgAi4B2vJam4T5q8yHNczvX', 0.1, '', NULL, 0, 0, 0),
-								(5, 'tGTAR2yw5jRWTcdv26s4MqsR55c85T51GV', 0.1, '', NULL, 0, 0, 0);
+INSERT INTO transactions VALUES (5, 'tAGRGCq7jEzkgAi4B2vJam4T5q8yHNczvX', 0.1, '', NULL, NULL, 0, 0, 0),
+								(5, 'tGTAR2yw5jRWTcdv26s4MqsR55c85T51GV', 0.1, '', NULL, NULL, 0, 0, 0);
 
 SELECT * FROM users;
 SELECT * FROM configs;

@@ -26,7 +26,7 @@
 									<a href="{{ url_for('logout') }}">Logout</a>
 								</td>
 								<td>
-									<a href="{{ url_for('account', username=session.username) }}">Account</a>
+									<a href="{{ url_for('accountInfo', username=session.username) }}">Account</a>
 								</td>
 							</tr>
 							
@@ -56,10 +56,10 @@
                                 <button type="submit" formaction="{{ url_for('register') }}">Register</button>
                             </td>
 						</tr>
-						{% if error %}
+						{% if loginError %}
 						<tr>
 							<td colspan="2">
-								<div id="error">{{ error }}</div>
+								<div id="error">{{ loginError }}</div>
 							</td>
 						</tr>
 						{% endif %}

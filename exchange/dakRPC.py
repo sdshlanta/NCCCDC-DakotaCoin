@@ -24,7 +24,7 @@ class dakRpc():
         balance = self.rpc.getbalance(account)
         return float(balance)
 
-    def getTransactions(self, account, start=0, end=10):
+    def getTransactions(self, account, start=0, end=10000):
         transactions = self.rpc.listtransactions(account, start, end)
         return transactions
 
@@ -42,11 +42,21 @@ class dakRpc():
                 raise e
 
     def send(self, fromAccount, toAddress, amount, message = ''):
-        toAccount = self.getAccountByAddress(toAddress)
-        if toAccount != '':
-            self.rpc.move(fromAccount, toAccount, amount, 1, message)
+        addrInfo = self.getAddressInfo(toAddress)
+
+        if addrInfo['ismine']:
+            self.rpc.move(fromAccount, addrInfo['account'], amount, 1, message)
+            return 'internal'
         else:
-            self.rpc.sendfrom(fromAccount, toAddress, amount, 1, message)
+            txid = self.rpc.sendfrom(fromAccount, toAddress, amount, 1, message)
+            return txid
 
     def getAddressInfo(self, address):
         return self.rpc.validateaddress(address)
+
+    def getAddressTransactionInfo(self, address):
+        print(self.rpc.listreceivedbyaddress())
+        try:
+            return list(filter(lambda balance: balance['address'] == address, self.rpc.listreceivedbyaddress()))[0]
+        except IndexError:
+            return None
