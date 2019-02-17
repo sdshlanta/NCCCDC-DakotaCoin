@@ -12,4 +12,5 @@
     ,"ldapPassword":"Password1!"
     ,"ldapBaseDN":"CN=Users,DC=ccdc,DC=local"
     ,"domain":"ccdc.local"
+    ,"adminGroup":"Web App Admins"
 }

@@ -56,7 +56,16 @@ class DakDb(object):
         cur.close()
         dbConn.close()
         return rows
-
+    
+    def createNewConfig(self, rpc_user, rpc_password, rpc_address, rpc_port, transact_interval):
+        insertionQuery = "INSERT INTO configs VALUES (?, ?, ?, ?, ?)"
+        dbConn = self._getDatabaseConnection()
+        cur = dbConn.cursor()
+        cur.execute(insertionQuery, (rpc_user, rpc_password, rpc_address, rpc_port, transact_interval))
+        dbConn.commit()
+        cur.close()
+        dbConn.close()
+    
     def checkUserCreds(self, username, password):
         selectQuery = "SELECT TOP 1 id FROM users WHERE user_name = ? AND user_password = ?"
         dbConn = self._getDatabaseConnection()

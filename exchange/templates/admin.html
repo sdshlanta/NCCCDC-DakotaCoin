@@ -1,0 +1,86 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - Admin Page{% endblock %}
+{% block content %}
+
+<h2>Current Config</h2>
+<form action="/admin" method="post">
+    <table border="1">
+        <tr>
+            <th>
+                RPC User
+            </th>
+            <td>
+                <input type="text" name="RPC_user" id="RPC_user", value="{{ RPC_user }}">
+            </td>
+        </tr>
+        <tr>
+            <th>
+                RPC Password
+            </th>
+            <td>
+                <input type="text" name="RPC_password" id="RPC_password", value="{{ RPC_password }}">
+            </td>
+        </tr>
+        <tr>
+            <th>
+                RPC Address
+            </th>
+            <td>
+                <input type="text" name="RPC_address" id="RPC_address", value="{{ RPC_address }}">
+            </td>
+        </tr>
+        <tr>
+            <th>
+                RPC Port
+            </th>
+            <td>
+                <input type="text" name="RPC_port" id="RPC_port", value="{{ RPC_port }}">
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Transaction Interval
+            </th>
+            <td>
+                <input type="text" name="transact_interval" id="transact_interval", value="{{ transact_interval }}">
+            </td>
+        </tr>
+    </table>
+    <button type="submit">Update</button>
+</form>
+
+<h2>Historical Configs</h2>
+<table border="1">
+    <tr>
+        <th>
+            id
+        </th>
+        <th>
+            RPC User
+        </th>
+        <th>
+            RPC Password
+        </th>
+        <th>
+            RPC Address
+        </th>
+        <th>
+            RPC Port
+        </th>
+        <th>
+            Transaction Interval
+        </th>
+    </tr>
+    {% for row in historicalConfigs %}
+    <tr>
+        {% for data in row %}
+        <td>
+            {{ data }}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

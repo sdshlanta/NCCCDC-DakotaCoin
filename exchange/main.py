@@ -80,6 +80,32 @@ def index():
         return render_template('index.html', **userInfo)
     return render_template('index.html', loginError=error)
 
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    error = None
+    if not session['logged_in'] or not ldapAuth.isAdmin(session['username']):
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        form = request.form
+        db.createNewConfig(form['RPC_user'], form['RPC_password'], form['RPC_address'], form['RPC_port'], form['transact_interval'])
+
+    info = db.getUserByName(session['username'])
+    currentConfig = db.getCurentConfig()
+    print(currentConfig)
+    info.update(currentConfig)
+    info['historicalConfigs'] = db.getHistoricalConfigs()
+    print(info['historicalConfigs'])
+    print(info)
+    try:
+        info['balance'] = rpc.getBalance(session['username'])
+    except ConnectionRefusedError:
+        balance = "Unable to contact RPC server"
+    info['error'] = error
+    return render_template('admin.html', **info)
+
+
 @app.route('/account', methods=['GET', 'POST'])
 def accountSearch():
     error = None
@@ -130,6 +156,7 @@ def resetPassword(username):
         userInfo['balance'] = rpc.getBalance(session['username'])
         userInfo['error'] = error
         return render_template('resetPassword.html', **userInfo)
+    return redirect(url_for('index'))
 
 @app.route('/addressinfo/<address>')
 def addressInfo(address):
@@ -305,7 +332,7 @@ if __name__ == "__main__":
     # processTransactions(db, rpc, logger, s)
     # import code
     # code.interact(local=locals())
-    ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'])
+    ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'], config['adminGroup'])
 
     app.secret_key = config['webAppSessionSecretKey']
 

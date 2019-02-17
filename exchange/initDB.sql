@@ -54,8 +54,6 @@ CREATE TABLE transaction_failures (
 
 CREATE TABLE configs (
 	id int NOT NULL IDENTITY PRIMARY KEY
-	,LDAP_user varchar(100) NOT NULL
-	,LDAP_password varchar(100) NOT NULL
 	,RPC_user varchar(100) NOT NULL
 	,RPC_password varchar(100) NOT NULL
 	,RPC_address char(20) NOT NULL
@@ -89,11 +87,12 @@ GO
 INSERT users VALUES ('mike' , 'A'),
 					('eric', 'B'),
 					('andrew', 'C'),
+					('goat', 'D'),
 					('dyl_up', 'myspamcondom@gmail.com'),
 					('test2', 'myspamcondom2@gmail.com');
 
-INSERT configs VALUES ('admin', 'password1!', 'username', 'password', '192.168.80.160', 9332, 60),
-					  ('admin', 'Password1!', 'username', 'password', '192.168.80.160', 9332, 5);
+INSERT configs VALUES ('username', 'password', '192.168.80.163', 9332, 60),
+					  ('username', 'password', '192.168.80.163', 9332, 5);
 
 INSERT INTO transactions VALUES (5, 'tAGRGCq7jEzkgAi4B2vJam4T5q8yHNczvX', 0.1, '', NULL, NULL, 0, 0, 0),
 								(5, 'tGTAR2yw5jRWTcdv26s4MqsR55c85T51GV', 0.1, '', NULL, NULL, 0, 0, 0);
