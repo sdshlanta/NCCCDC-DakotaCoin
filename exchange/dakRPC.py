@@ -60,3 +60,6 @@ class dakRpc():
             return list(filter(lambda balance: balance['address'] == address, self.rpc.listreceivedbyaddress()))[0]
         except IndexError:
             return None
+
+    def getTransactionInfo(self, txid):
+        return self.rpc.gettransaction(txid)

@@ -143,3 +143,13 @@ class DakDb(object):
         dbConn.commit()
         cur.close()
         dbConn.close()
+
+    def isUnsent(self, txid):
+        selectQuery = "SELECT * FROM unsent_transactions WHERE daktxid = ?"
+        dbConn = self._getDatabaseConnection()
+        cur = dbConn.cursor()
+        cur.execute(selectQuery, (txid,))
+        rows = [row for row in cur]
+        cur.close()
+        dbConn.close()
+        return any(rows)

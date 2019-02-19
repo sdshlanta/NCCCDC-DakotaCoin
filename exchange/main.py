@@ -179,7 +179,18 @@ def addressInfo(address):
 
 @app.route('/transactionInfo/<txid>')
 def transactionInfo(txid):
-    return txid
+    error = None
+    transactInfo = rpc.getTransactionInfo(txid)
+    if transactionInfo:
+        
+    
+    if session['logged_in']:
+        userInfo = db.getUserByName(session['username'])
+        userInfo['balance'] = rpc.getBalance(session['username'])
+        userInfo['error'] = error
+        transactInfo.update(userInfo)
+    return render_template('addressInfo.html', **transactInfo)
+
 
 @app.route('/send', methods=['GET', 'POST'])
 def send():
