@@ -1,8 +1,8 @@
 {
-    "dbHost":"MSI"
+    "dbHost":"192.168.1.25"
     ,"dbDatabase":"exchange"
-    ,"dbUser":"webApp"
-    ,"dbPassword":"password"
+    ,"dbUser":"sa"
+    ,"dbPassword":"Password1!"
     ,"webAppSessionSecretKey":"changeme"
     ,"logFile":"exchange.log"
     ,"logMaxBytes":100000

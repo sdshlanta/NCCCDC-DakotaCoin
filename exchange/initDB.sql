@@ -1,8 +1,3 @@
---ALTER LOGIN webApp ENABLE ;
---GO
---ALTER LOGIN webApp WITH PASSWORD = 'password' ;  
---GO  
-
 USE exchange;
 GO
 DROP TABLE IF EXISTS [dbo].[dakotacoinAccounts];
@@ -84,18 +79,11 @@ CREATE VIEW cancled_transactions AS
 	WHERE cancled = 1;
 GO
 
-INSERT users VALUES ('mike' , 'A'),
-					('eric', 'B'),
-					('andrew', 'C'),
-					('goat', 'D'),
-					('dyl_up', 'myspamcondom@gmail.com'),
-					('test2', 'myspamcondom2@gmail.com');
+INSERT users VALUES ('Administrator','Administrator@ccdc.local'),
+					('goat', 'goat@ccdc.local');
 
-INSERT configs VALUES ('username', 'password', '192.168.80.163', 9332, 60),
-					  ('username', 'password', '192.168.80.163', 9332, 5);
+INSERT configs VALUES ('username', 'password', '192.168.80.163', 9332, 60);
 
-INSERT INTO transactions VALUES (5, 'tAGRGCq7jEzkgAi4B2vJam4T5q8yHNczvX', 0.1, '', NULL, NULL, 0, 0, 0),
-								(5, 'tGTAR2yw5jRWTcdv26s4MqsR55c85T51GV', 0.1, '', NULL, NULL, 0, 0, 0);
 
 SELECT * FROM users;
 SELECT * FROM configs;
