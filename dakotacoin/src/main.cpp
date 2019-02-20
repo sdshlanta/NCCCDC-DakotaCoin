@@ -31,7 +31,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x2eab55beb50b15fe97a33b632125ddc4bb1b284a59a855317654503bc4148369");
+uint256 hashGenesisBlock("0x65887e60673755e6a13aea0f8d535ed7252f485e737d97ff0a0dcb34c0a66e85");
 static CBigNum bnProofOfWorkLimit = CBigNum().SetCompact(504365644); // DakotaCoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -1079,8 +1079,8 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 30240000; // DakotaCoin: 3.5 days
-static const int64 nTargetSpacing = 10; // DakotaCoin: 2.5 minutes
+static const int64 nTargetTimespan = 3024000; // DakotaCoin: 3.5 days
+static const int64 nTargetSpacing = 150; // DakotaCoin: 2.5 minutes
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
@@ -2728,7 +2728,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0xc1;
         pchMessageStart[2] = 0xb7;
         pchMessageStart[3] = 0xdc;
-        hashGenesisBlock = uint256("0x5a8f77c78d727e13470a7a18eb0f51f32a4a8096ab2d18081cc45e91daec5b1e");
+        hashGenesisBlock = uint256("0x4d024ab6887cfb840529814fa4e25e1f1fa0d970fb3a7923deec10147d8f610b");
     }
 
     //
@@ -2761,26 +2761,26 @@ bool InitBlockIndex() {
         //   vMerkleTree: 97ddfbbae6
 
         // Genesis block
-        const char* pszTimestamp = "fish_are_hot";
+        const char* pszTimestamp = "Fish Are Hot";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].nValue = 10000000000;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex("2a929eec9b2d311bebc3b484c6f1aaf46c578e7acb43542acc14b2ffa9e80bd80000cf44ca8b28ff09dee58c745344abc5b1d65f4c6875b948686792c22a401957") << OP_CHECKSIG;
+        txNew.vout[0].nValue = 50000000000;
+        txNew.vout[0].scriptPubKey = CScript() << ParseHex("d9c549682a8c5ac439b17d6425711d6e1ee59a41382b9546cf1cda5a9596f267ef8fb908995f1dcec1584641ae3ee69665f66d461517d634a7bcaf2691dedbf28e") << OP_CHECKSIG;
         CBlock block;
         block.vtx.push_back(txNew);
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1549397620;
+        block.nTime    = 1550621870;
         block.nBits    = 504365644;
-        block.nNonce   = 1726881131;
+        block.nNonce   = 3813037698;
 
         if (fTestNet)
         {
-            block.nTime    = 1549397620;
-            block.nNonce   = 2175388324;
+            block.nTime    = 1550621870;
+            block.nNonce   = 1943398976;
         }
 
         //// debug print
@@ -2788,7 +2788,7 @@ bool InitBlockIndex() {
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x8502a59f529c5228dac606e29c4c19e0bd0ce28d46072aab906ccae4e9d4abd5"));
+        assert(block.hashMerkleRoot == uint256("0x098c10edd6866a7bae433218538555bcd2976ed8a9fbb6fce550ea42dfaf28e4"));
         block.print();
         assert(hash == hashGenesisBlock);
 
