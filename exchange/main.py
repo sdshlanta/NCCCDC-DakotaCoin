@@ -182,7 +182,7 @@ def transactionInfo(txid):
     error = None
     transactInfo = rpc.getTransactionInfo(txid)
     if transactionInfo:
-        
+        pass    
     
     if session['logged_in']:
         userInfo = db.getUserByName(session['username'])
