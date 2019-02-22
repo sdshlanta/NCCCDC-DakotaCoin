@@ -279,12 +279,11 @@ def logExceptions(e):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
-parser = argparse.ArgumentParser('Mt. CCDC Crypto exchange backend')
-parser.add_argument('ConfigFile', type=str, help='File containing inital configureation information')
-args = parser.parse_args()
+
+
 
 try:
-    with open(args.ConfigFile) as fp:
+    with open('config.json') as fp:
         config = json.load(fp)
 except FileNotFoundError:
     print('Could not find configuration file at %s' % args.ConfigFile)
