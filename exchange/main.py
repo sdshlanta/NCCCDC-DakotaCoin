@@ -14,6 +14,7 @@ from flask import Flask, redirect, render_template, request, session, url_for, s
 import dakDB
 import dakRPC
 import dakLDAP
+from transactionProcessor import processTransactions
 
 app = Flask(__name__)
 
@@ -22,28 +23,6 @@ app.config['LDAP_HOST'] = 'dc01'
 app.config['LDAP_USERNAME'] = 'cn=Administrator,CN=Users,DC=ccdc,DC=local'
 app.config['LDAP_PASSWORD'] = 'Password1!'
 app.config['LDAP_BASE_DN'] = 'CN=Users,DC=ccdc,DC=local'
-
-def processTransactions(db, rpc, logger, delay):
-    while True:
-        txs = db.getUnsetTransactions()
-        sent = []
-        for tx in txs:
-            try:
-                daktxid = rpc.send(tx['user_name'], tx['toAddress'], tx['amount'], tx['message'])
-                sent.append((daktxid, tx['txid']))
-            except Exception as _:
-                ts = strftime('[%Y-%b-%d %H:%M]')
-                tb = traceback.format_exc()
-                logger.error('%s %s %s %s DAKRPC ERROR IN SENDING\n%s',
-                    ts,
-                    tx['txid'],
-                    tx['toAddress'],
-                    tx['user_name'],
-                    tb)
-        if any(sent):
-            db.markTransactionsAsSent(sent)
-        sleep(delay)
-
 
 def registerUser(username, password, email):
     db.createUser(username, email)
@@ -300,51 +279,51 @@ def logExceptions(e):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+parser = argparse.ArgumentParser('Mt. CCDC Crypto exchange backend')
+parser.add_argument('ConfigFile', type=str, help='File containing inital configureation information')
+args = parser.parse_args()
+
+try:
+    with open(args.ConfigFile) as fp:
+        config = json.load(fp)
+except FileNotFoundError:
+    print('Could not find configuration file at %s' % args.ConfigFile)
+    sys.exit(-2)
+except PermissionError:
+    print('Could not read configuration file at %s' % args.ConfigFile)
+    sys.exit(-3)
+except IOError as e:
+    print('Error accessing configuration file at %s')
+    print(str(e))
+    sys.exit(-4)
+
+db = dakDB.DakDb(
+    config['dbHost']
+    ,config['dbDatabase']
+    ,config['dbUser']
+    ,config['dbPassword']
+)
+handler = RotatingFileHandler(config['logFile'], maxBytes=config['logMaxBytes'], backupCount=config['logBackups'])
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+
+config.update(db.getCurentConfig())
+
+rpc = dakRPC.dakRpc(
+    config['RPC_address'].strip()
+    ,config['RPC_port']
+    ,config['RPC_user']
+    ,config['RPC_password']
+)
+p = Process(target=processTransactions, args=(db, rpc, logger, config['transact_interval']))
+p.start()
+# processTransactions(db, rpc, logger, s)
+# import code
+# code.interact(local=locals())
+ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'], config['adminGroup'])
+
+app.secret_key = config['webAppSessionSecretKey']
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser('Mt. CCDC Crypto exchange backend')
-    parser.add_argument('ConfigFile', type=str, help='File containing inital configureation information')
-    args = parser.parse_args()
-
-    try:
-        with open(args.ConfigFile) as fp:
-            config = json.load(fp)
-    except FileNotFoundError:
-        print('Could not find configuration file at %s' % args.ConfigFile)
-        sys.exit(-2)
-    except PermissionError:
-        print('Could not read configuration file at %s' % args.ConfigFile)
-        sys.exit(-3)
-    except IOError as e:
-        print('Error accessing configuration file at %s')
-        print(str(e))
-        sys.exit(-4)
-    
-    db = dakDB.DakDb(
-        config['dbHost']
-        ,config['dbDatabase']
-        ,config['dbUser']
-        ,config['dbPassword']
-    )
-    handler = RotatingFileHandler(config['logFile'], maxBytes=config['logMaxBytes'], backupCount=config['logBackups'])
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    logger.addHandler(handler)
-
-    config.update(db.getCurentConfig())
-
-    rpc = dakRPC.dakRpc(
-        config['RPC_address'].strip()
-        ,config['RPC_port']
-        ,config['RPC_user']
-        ,config['RPC_password']
-    )
-    p = Process(target=processTransactions, args=(db, rpc, logger, config['transact_interval']))
-    p.start()
-    # processTransactions(db, rpc, logger, s)
-    # import code
-    # code.interact(local=locals())
-    ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'], config['adminGroup'])
-
-    app.secret_key = config['webAppSessionSecretKey']
-
     app.run(debug=True)
