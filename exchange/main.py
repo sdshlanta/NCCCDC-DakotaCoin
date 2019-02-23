@@ -283,16 +283,16 @@ def favicon():
 
 
 try:
-    with open('config.json') as fp:
+    with open('/var/www/NCCCDC-DakotaCoin/exchange/config.json') as fp:
         config = json.load(fp)
 except FileNotFoundError:
-    print('Could not find configuration file at %s' % args.ConfigFile)
+    print('Could not find configuration file at /var/www/NCCCDC-DakotaCoin/exchange/config.json')
     sys.exit(-2)
 except PermissionError:
-    print('Could not read configuration file at %s' % args.ConfigFile)
+    print('Could not read configuration file at /var/www/NCCCDC-DakotaCoin/exchange/config.json')
     sys.exit(-3)
 except IOError as e:
-    print('Error accessing configuration file at %s')
+    print('Error accessing configuration file at /var/www/NCCCDC-DakotaCoin/exchange/config.json')
     print(str(e))
     sys.exit(-4)
 
