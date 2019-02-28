@@ -303,8 +303,8 @@ def favicon():
 
 # if __name__ == "__main__":
 
-#     # configFile = '/var/www/NCCCDC-DakotaCoin/exchange/config.json'
-configFile = 'config.json'
+configFile = '/var/www/NCCCDC-DakotaCoin/exchange/config.json'
+# configFile = 'config.json'
 try:
     with open(configFile) as fp:
         config = json.load(fp)
