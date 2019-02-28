@@ -1,4 +1,4 @@
-from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
+from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException, 
 
 class dakRpc():
     def __init__(self, RpcAddr, RpcPort, RcpUser, RpcPass):    
@@ -21,7 +21,10 @@ class dakRpc():
         return address
     
     def getBalance(self, account):
-        balance = self.rpc.getbalance(account)
+        try:
+            balance = self.rpc.getbalance(account)
+        except:
+            balance = float('NaN')
         return float(balance)
 
     def getTransactions(self, account, start=0, end=10000):
