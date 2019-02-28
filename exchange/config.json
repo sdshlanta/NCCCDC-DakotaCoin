@@ -2,7 +2,7 @@
     "dbHost":"db01.ccdc.local"
     ,"dbDatabase":"exchange"
     ,"dbUser":"sa"
-    ,"dbPassword":"password"
+    ,"dbPassword":"Password1!"
     ,"webAppSessionSecretKey":"changeme"
     ,"logFile":"exchange.log"
     ,"logMaxBytes":100000
