@@ -1,13 +1,13 @@
 {
-    "dbHost":"localhost"
+    "dbHost":"db01.ccdc.local"
     ,"dbDatabase":"exchange"
-    ,"dbUser":"webApp"
+    ,"dbUser":"sa"
     ,"dbPassword":"password"
     ,"webAppSessionSecretKey":"changeme"
     ,"logFile":"exchange.log"
     ,"logMaxBytes":100000
     ,"logBackups":1
-    ,"ldapHost":"192.168.1.10"
+    ,"ldapHost":"dc01.ccdc.local"
     ,"ldapUser":"ccdc\\Administrator"
     ,"ldapPassword":"Password1!"
     ,"ldapBaseDN":"CN=Users,DC=ccdc,DC=local"
