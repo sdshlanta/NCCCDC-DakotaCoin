@@ -1,4 +1,4 @@
-from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException, 
+from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
 
 class dakRpc():
     def __init__(self, RpcAddr, RpcPort, RcpUser, RpcPass):    
