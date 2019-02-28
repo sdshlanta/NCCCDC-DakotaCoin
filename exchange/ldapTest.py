@@ -1,72 +1,57 @@
-from flask import Flask, g, request, session, redirect, url_for
-from flask_simpleldap import LDAP
+# from ldap3 import Server, Connection, ALL, MODIFY_REPLACE, NTLM
 
-app = Flask(__name__)
-app.secret_key = 'dev key'
-app.debug = True
+# config = {}
 
-app.config['LDAP_HOST'] = 'dc01'
-app.config['LDAP_USERNAME'] = 'cn=Administrator,CN=Users,DC=ccdc,DC=local'
-app.config['LDAP_PASSWORD'] = 'Password1!'
-app.config['LDAP_BASE_DN'] = 'CN=Users,DC=ccdc,DC=local'
-app.config['LDAP_USER_OBJECT_FILTER'] = '(&(objectclass=person)(cn=%s))'
+# config['LDAP_HOST'] = 'dc01'
+# config['LDAP_USERNAME'] = 'cn=Administrator,CN=Users,DC=ccdc,DC=local'
+# config['LDAP_PASSWORD'] = 'Password1!'
+# config['LDAP_BASE_DN'] = 'CN=Users,DC=ccdc,DC=local'
+# config['LDAP_USER_OBJECT_FILTER'] = '(&(objectclass=person)(cn=%s))'
 
+# server = Server('dc01.ccdc.local')
+# conn = Connection(server)
+# conn.bind()
+# print(conn)
 # CN=Administrator,CN=Users,DC=ccdc,DC=local
-# Group configuration
-# app.config['LDAP_GROUP_MEMBERS_FIELD'] = "uniquemember"
-# app.config['LDAP_GROUP_OBJECT_FILTER'] = "(&(objectclass=groupOfUniqueNames)(uniquemember=%s))"
-# app.config['LDAP_GROUP_MEMBER_FILTER'] = "(&(cn=*)(objectclass=groupOfUniqueNames)(uniquemember=%s))"
-# app.config['LDAP_GROUP_MEMBER_FILTER_FIELD'] = "cn"
 
-ldap = LDAP(app)
+# class fromconfig:
+#     def __init__(self):
+#         Config = configparser.ConfigParser()
+#         Config.read("config.ini")
+#         self.serverip = Config.get('serverinfo', 'ip')
+#         self.basepath = Config.get('serverinfo', 'base')
+#         self.container = Config.get('serverinfo', 'container')
+#         self.dc1 = Config.get('serverinfo', 'dc1')
+#         self.dc2 = Config.get('serverinfo', 'dc2')
+#         self.ou = Config.get('serverinfo', 'ou')
 
+# def add_user(username, givenname, surname, userPrincipalName, SAMAccountName, userPassword):
 
-@app.before_request
-def before_request():
-    g.user = None
-    if 'user_id' in session:
-        # This is where you'd query your database to get the user info.
-        g.user = {}
-        # Create a global with the LDAP groups the user is a member of.
-        g.ldap_groups = ldap.get_user_groups(user=session['user_id'])
+#     ad_server = Server(config.serverip, use_ssl=True, get_info=ALL) 
 
+#     ad_c = Connection(ad_server, user='domain\\user', password='password', authentication=NTLM)
 
-@app.route('/')
-@ldap.login_required
-def index():
-    return 'Successfully logged in!'
+#     if ad_c.bind():
+#         ad_c.add('cn={},cn={},dc={},dc={}'.format(username, config.ou, config.dc1, config.dc2), ['person', 'user'], {'givenName': givenname, 'sn': surname, 'userPrincipalName': userPrincipalName, 'sAMAccountName': SAMAccountName, 'userPassword': userPassword})
 
+#         ad_c.extend.microsoft.unlock_account(user='cn={},cn={},dc={},dc={}'.format(username, config.container, config.dc1, config.dc2))      
+        
+#         ad_c.extend.microsoft.modify_password(user='cn={},cn={},dc={},dc={}'.format(username, config.container, config.dc1, config.dc2), new_password=userpassword, old_password=None)
+        
+#         changeUACattribute = {"userAccountControl": (MODIFY_REPLACE, [512])}
+        
+#         ad_c.modify('cn={},cn={},dc={},dc={}'.format(username, config.container, config.dc1, config.dc2), changes=changeUACattribute)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if g.user:
-        return redirect(url_for('index'))
-    if request.method == 'POST':
-        user = request.form['user']
-        passwd = request.form['passwd']
-        test = ldap.bind_user(user, passwd)
-        if test is None or passwd == '':
-            return 'Invalid credentials'
-        else:
-            session['user_id'] = request.form['user']
-            return redirect('/')
-    return """<form action="" method="post">
-                user: <input name="user"><br>
-                password:<input type="password" name="passwd"><br>
-                <input type="submit" value="Submit"></form>"""
+#     ad_c.unbind()
 
 
-@app.route('/group')
-@ldap.group_required(groups=['web-developers'])
-def group():
-    return 'Group restricted page'
+from dakLDAP import dakLdap
 
+ldapAuth = dakLdap('dc02','ccdc\\Administrator', 'Password1!', 'CN=Users,DC=ccdc,DC=local', 'ccdc.local','Web App Admins')
 
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    return redirect(url_for('index'))
+print(ldapAuth.checkUserCreds('Goat', 'Password1!'))
 
+ldapAuth.createUser('test3', 'Password1!')
 
-if __name__ == '__main__':
-    app.run()
+print(ldapAuth.checkUserCreds('test3', 'Password1!'))
+print(ldapAuth.isAdmin('*'))

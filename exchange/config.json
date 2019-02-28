@@ -1,8 +1,8 @@
 {
-    "dbHost":"192.168.1.25"
+    "dbHost":"localhost"
     ,"dbDatabase":"exchange"
-    ,"dbUser":"sa"
-    ,"dbPassword":"Password1!"
+    ,"dbUser":"webApp"
+    ,"dbPassword":"password"
     ,"webAppSessionSecretKey":"changeme"
     ,"logFile":"exchange.log"
     ,"logMaxBytes":100000

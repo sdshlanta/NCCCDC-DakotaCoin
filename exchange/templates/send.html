@@ -2,6 +2,9 @@
 {{super()}}
 {% block title %}Mt. CCDC{% endblock %}
 {% block content %}
+{% if error %}
+    <div id="error">{{ error }}</div>
+{% endif %}
 <form action="/send", method="POST">
     <table>
         <tr>

@@ -62,4 +62,9 @@ class dakRpc():
             return None
 
     def getTransactionInfo(self, txid):
-        return self.rpc.gettransaction(txid)
+        try:
+            txinfo =  self.rpc.gettransaction(txid)
+            txinfo['local'] = False
+            return txinfo
+        except JSONRPCException:
+            return {}

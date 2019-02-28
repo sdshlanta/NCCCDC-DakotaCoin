@@ -23,10 +23,14 @@
     <tr>
         <th>Transaction ID</th><th>Sent To</th><th>Amount</th><TH>Time Sent</TH><th>Message</th><th>Sent</th><th>Cancled</th><th>failed</th>
     </tr>
-    {% for txid, userId, sentTo, amount, message, timeSent, sent, cancled, failed  in transactions %}
+    {% for txid, userId, sentTo, amount, message, timeSent, daktxid, sent, cancled, failed  in transactions %}
     <tr>
         <td>
-            {{ txid }}
+            {% if daktxid != "internal" and daktxid %}
+                <a href="{{ url_for('transactionInfo', txid=daktxid) }}">{{ daktxid }}</a>
+            {% else %}
+                <a href="{{ url_for('transactionInfo', txid=txid) }}">{{ txid }}</a>
+            {% endif %}
         </td>
         <td>
             {{ sentTo }}
@@ -48,6 +52,11 @@
         </td>
         <td>
             {{ failed }}
+        </td>
+        <td>
+            {% if not sent %}
+                <a href="{{ url_for('cancel', txid=txid) }}">Cancel Transaction</a>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}

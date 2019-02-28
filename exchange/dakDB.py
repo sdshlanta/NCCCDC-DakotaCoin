@@ -105,6 +105,16 @@ class DakDb(object):
         cur.close()
         dbConn.close()
         return rows[0]
+    
+    def getAllUsers(self):
+        selectQuery = "SELECT * FROM users"
+        dbConn = self._getDatabaseConnection()
+        cur = dbConn.cursor()
+        cur.execute(selectQuery, id)
+        rows = [{column[0]:rowElement for column, rowElement in zip (cur.description, row)} for row in cur]
+        cur.close()
+        dbConn.close()
+        return rows
 
     def getUnsetTransactions(self):
         selectQuery = "SELECT * FROM unsent_transactions"
@@ -135,8 +145,31 @@ class DakDb(object):
         dbConn.close()
         return rows
 
+    def getTransaction(self, txid):
+        selectQuery = "SELECT TOP 1 * FROM transactions WHERE txid = ?"
+        dbConn = self._getDatabaseConnection()
+        cur = dbConn.cursor()
+        cur.execute(selectQuery, txid)
+        rows = [{column[0]:rowElement for column, rowElement in zip (cur.description, row)} for row in cur]
+        cur.close()
+        dbConn.close()
+        if any(rows):
+            rows[0]['local'] = True
+            return rows[0]
+        else:
+            return {'local':False}
+
+    def markTransactionsAsCanceled(self, txid):
+        updateQuery = "UPDATE transactions SET cancled=1 WHERE txid = ?"
+        dbConn = self._getDatabaseConnection()
+        cur = dbConn.cursor()
+        cur.execute(updateQuery, txid)
+        dbConn.commit()
+        cur.close()
+        dbConn.close()
+
     def createTransaction(self, userId, toAddress, amount, message):
-        insertionQuery = "INSERT INTO transactions VALUES (?, ?, ?, ?, NULL, 0, 0, 0)"
+        insertionQuery = "INSERT INTO transactions VALUES (?, ?, ?, ?, NULL, NULL, 0, 0, 0)"
         dbConn = self._getDatabaseConnection()
         cur = dbConn.cursor()
         cur.execute(insertionQuery, (userId, toAddress, amount, message))

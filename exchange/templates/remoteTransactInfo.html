@@ -1,0 +1,31 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - Remote Transaction Info {% endblock %}
+{% block content %}
+
+<table>
+    <tr>
+        <th>
+            TXID
+        </th>
+        <td>
+            {{ txid }}
+        </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr>
+        <th>
+            Amount
+        </th>
+        <td>
+            {{ amount }}
+        </td>
+    </tr>
+</table>
+
+<pre><code>
+{{ json }}
+</code></pre>
+
+{% endblock %}

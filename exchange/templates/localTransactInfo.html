@@ -1,0 +1,64 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - Local Transaction Info {% endblock %}
+{% block content %}
+<table>
+    <tr>
+        <th>
+            txid
+        </th>
+        <td>
+            {{ txid }}
+        </td>
+    </tr>
+    <tr>
+        <th>
+            DakotaCon TXID
+        </th>
+        <td>
+            {% if daktxid != "internal" and daktxid %}
+                <a href="url_for('transactionInfo', txid=daktxid)">{{ daktxid }}</a>
+            {% else %}
+                Local to Local transaction
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Account
+        </th>
+        <td>
+            <a href="{{ url_for('addressInfo', address=toAddress) }}">{{ toAddress }}</a>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Amount
+        </th>
+        <td>
+            {{ amount }}
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Time Sent   
+        </th>
+        <td>
+            {{ timeSent }}
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Message
+        </th>
+        <td>
+            {{ message }}
+        </td>
+    </tr>
+</table>
+
+<pre><code>
+{{ json }}
+</code></pre>
+
+{% endblock %}

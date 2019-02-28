@@ -5,7 +5,7 @@ import sched
 import logging
 import argparse
 import traceback
-from pprint import pprint
+from pprint import pprint, pformat
 from time import strftime, sleep
 from multiprocessing import Process
 from logging.handlers import RotatingFileHandler
@@ -80,10 +80,23 @@ def admin():
     try:
         info['balance'] = rpc.getBalance(session['username'])
     except ConnectionRefusedError:
-        balance = "Unable to contact RPC server"
+        info['balance'] = "Unable to contact RPC server"
     info['error'] = error
     return render_template('admin.html', **info)
 
+@app.route('/cancel/<txid>')
+def cancel(txid):
+    if not session['logged_in']:
+        return redirect(url_for('index'))
+    
+
+    transaction = db.getTransaction(txid)
+    if transaction:
+        if transaction['userid'] == session['userid']:
+            if not transaction['sent']:
+                db.markTransactionsAsCanceled(txid)
+
+    return redirect(url_for('accountInfo', username=session['username']))
 
 @app.route('/account', methods=['GET', 'POST'])
 def accountSearch():
@@ -159,16 +172,23 @@ def addressInfo(address):
 @app.route('/transactionInfo/<txid>')
 def transactionInfo(txid):
     error = None
+    transactInfo = {}
     transactInfo = rpc.getTransactionInfo(txid)
-    if transactionInfo:
-        pass    
-    
+    if not transactInfo:
+        transactInfo = db.getTransaction(txid)
+    if not any(transactInfo):
+        transactInfo['error'] = 'Invalid transaciton ID'
+    transactInfo['json'] = pformat(transactInfo)
     if session['logged_in']:
         userInfo = db.getUserByName(session['username'])
         userInfo['balance'] = rpc.getBalance(session['username'])
         userInfo['error'] = error
         transactInfo.update(userInfo)
-    return render_template('addressInfo.html', **transactInfo)
+    if transactInfo['local']:
+        return render_template('localTransactInfo.html', **transactInfo)
+    else:
+        return render_template('remoteTransactInfo.html', **transactInfo)
+        
 
 
 @app.route('/send', methods=['GET', 'POST'])
@@ -204,8 +224,8 @@ def send():
             else:
                 error = "Insufficient Funds to send %f DAK" % amount
         else:
-            error = "%s is an invalid DakotaCoin address"
-
+            error = "%s is an invalid DakotaCoin address" % toAddress
+        
     userInfo = db.getUserByName(session['username'])
     userInfo['balance'] = ballance
     userInfo['error'] = error
@@ -281,9 +301,12 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
+# if __name__ == "__main__":
 
+#     # configFile = '/var/www/NCCCDC-DakotaCoin/exchange/config.json'
+configFile = 'config.json'
 try:
-    with open('/var/www/NCCCDC-DakotaCoin/exchange/config.json') as fp:
+    with open(configFile) as fp:
         config = json.load(fp)
 except FileNotFoundError:
     print('Could not find configuration file at /var/www/NCCCDC-DakotaCoin/exchange/config.json')
@@ -317,9 +340,7 @@ rpc = dakRPC.dakRpc(
 )
 p = Process(target=processTransactions, args=(db, rpc, logger, config['transact_interval']))
 p.start()
-# processTransactions(db, rpc, logger, s)
-# import code
-# code.interact(local=locals())
+
 ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'], config['adminGroup'])
 
 app.secret_key = config['webAppSessionSecretKey']
