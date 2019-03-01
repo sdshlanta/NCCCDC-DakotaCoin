@@ -1,12 +1,13 @@
 from ldap3 import Server, ObjectDef, Connection, Reader, ALL, NTLM, MODIFY_REPLACE
 
 class dakLdap():
-    def __init__(self, host, SAUsername, SAPassword, DNBase, domain, adminGroup):
+    def __init__(self, host, SAUsername, SAPassword, DNBase, domain, adminGroup, webUsersGroup):
         self.host = host
         self.SAUsername = SAUsername
         self.SAPassword = SAPassword
         self.DNBase = DNBase
         self.domain = domain
+        self.webUsersGroup = webUsersGroup
         self.server = Server(self.host, use_ssl=True)
         self.conn = Connection(self.server, user=self.SAUsername, password=self.SAPassword, authentication=NTLM)
         self.adminObject = ObjectDef('user')
@@ -47,7 +48,7 @@ class dakLdap():
         self.conn.extend.microsoft.modify_password(DN, password, None)
         changeUACattribute = {"userAccountControl": (MODIFY_REPLACE, [512])}
         self.conn.modify(DN, changes=changeUACattribute)
-        self.conn.extend.microsoft.add_members_to_groups([DN], ['CN=Web App Users,CN=Users,DC=ccdc,DC=local'])
+        self.conn.extend.microsoft.add_members_to_groups([DN], [self.webUsersGroup])
         self.conn.unbind()
     
     def isAdmin(self, username):

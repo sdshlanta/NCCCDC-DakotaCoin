@@ -341,7 +341,7 @@ rpc = dakRPC.dakRpc(
 p = Process(target=processTransactions, args=(db, rpc, logger, config['transact_interval']))
 p.start()
 
-ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'], config['adminGroup'])
+ldapAuth = dakLDAP.dakLdap(config['ldapHost'],config['ldapUser'], config['ldapPassword'], config['ldapBaseDN'], config['domain'], config['adminGroup'], config['webUsersGroup'])
 
 app.secret_key = config['webAppSessionSecretKey']
 
