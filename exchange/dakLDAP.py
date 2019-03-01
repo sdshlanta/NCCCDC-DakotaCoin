@@ -44,7 +44,7 @@ class dakLdap():
         principalName = '%s@%s' % (username, self.domain)
         self.conn.add(DN, ['user', 'top'], {'sAMAccountName':username, 'userPassword':password, 'userPrincipalName':principalName})
         self.conn.extend.microsoft.unlock_account(user=DN)
-        print(self.conn.extend.microsoft.modify_password(DN, password, None))
+        self.conn.extend.microsoft.modify_password(DN, password, None)
         changeUACattribute = {"userAccountControl": (MODIFY_REPLACE, [512])}
         self.conn.modify(DN, changes=changeUACattribute)
         self.conn.extend.microsoft.add_members_to_groups([DN], ['CN=Web App Users,CN=Users,DC=ccdc,DC=local'])
