@@ -18,12 +18,6 @@ from transactionProcessor import processTransactions
 
 app = Flask(__name__)
 
-
-app.config['LDAP_HOST'] = 'dc01'
-app.config['LDAP_USERNAME'] = 'cn=Administrator,CN=Users,DC=ccdc,DC=local'
-app.config['LDAP_PASSWORD'] = 'Password1!'
-app.config['LDAP_BASE_DN'] = 'CN=Users,DC=ccdc,DC=local'
-
 def registerUser(username, password, email):
     db.createUser(username, email)
     rpc.addNewAccount(username)
