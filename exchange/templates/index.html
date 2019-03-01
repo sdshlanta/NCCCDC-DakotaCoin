@@ -2,6 +2,12 @@
 {{super()}}
 {% block title %}Mt. CCDC{% endblock %}
 {% block content %}
-<a href="{{ url_for('send') }}">Send DakotaCoin</a>
-<a href="{{ url_for('accountSearch') }}">Lookup an account</a>
+<ul>
+    <li>
+        <a href="{{ url_for('send') }}">Send DakotaCoin</a>
+    </li>
+    <li>
+        <a href="{{ url_for('accountSearch') }}">Lookup an account</a>
+    </li>
+</ul>
 {% endblock %}
