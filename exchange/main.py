@@ -182,8 +182,6 @@ def transactionInfo(txid):
         return render_template('localTransactInfo.html', **transactInfo)
     else:
         return render_template('remoteTransactInfo.html', **transactInfo)
-        
-
 
 @app.route('/send', methods=['GET', 'POST'])
 def send():
@@ -293,7 +291,6 @@ def logExceptions(e):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
 
 # if __name__ == "__main__":
 
