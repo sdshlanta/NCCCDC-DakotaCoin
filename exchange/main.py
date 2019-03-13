@@ -292,10 +292,10 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# if __name__ == "__main__":
 
 configFile = '/var/www/NCCCDC-DakotaCoin/exchange/config.json'
-# configFile = 'config.json'
+if __name__ == "__main__":
+    configFile = 'config.json'
 try:
     with open(configFile) as fp:
         config = json.load(fp)
