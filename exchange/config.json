@@ -13,5 +13,5 @@
     ,"ldapBaseDN":"CN=Users,DC=ccdc,DC=local"
     ,"domain":"ccdc.local"
     ,"adminGroup":"Web App Admins"
-    ,"webUsersGroup":"CN=Web App Users,CN=Builtin,DC=ccdc,DC=local"
+    ,"webUsersGroup":"CN=Web App Users,CN=Users,DC=ccdc,DC=local"
 }
