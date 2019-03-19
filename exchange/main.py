@@ -140,7 +140,7 @@ def accountInfo(username = None):
                         False,
                         False                        
                     )
-                dbTrans.extend(data)
+                dbTrans.append(data)
                 
         userInfo['transactions'] = dbTrans
     except KeyError:
