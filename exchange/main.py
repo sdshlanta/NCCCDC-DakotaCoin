@@ -120,7 +120,29 @@ def accountInfo(username = None):
     if session['logged_in']:
         userInfo['balance'] = rpc.getBalance(session['username'])
     try:
-        userInfo['transactions'] = db.getTransactions(userInfo['id'])
+        dbTrans = db.getTransactions(userInfo['id'])
+        for transact in rpc.rpc.listtransactions(username):
+            txid = transact['txid']
+            
+            if 'message' not in transact:
+                transact['message'] = ''
+
+            if not any([txid == t['daktxid'] for t in dbTrans]):
+                data = (
+                        '',
+                        userInfo['id'],
+                        transact['address'],
+                        float(transact['amount']),
+                        transact['message'],
+                        transact['time'],
+                        transact['txid'],
+                        True,
+                        False,
+                        False                        
+                    )
+                dbTrans.extend(data)
+                
+        userInfo['transactions'] = dbTrans
     except KeyError:
         error = 'The user "%s" does not exist' % username
         userInfo['transactions'] = []

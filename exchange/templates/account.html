@@ -21,7 +21,7 @@
 <h2>Transactions</h2>
 <table border="1">
     <tr>
-        <th>Transaction ID</th><th>Sent To</th><th>Amount</th><TH>Time Sent</TH><th>Message</th><th>Sent</th><th>Cancled</th><th>failed</th>
+        <th>Transaction ID</th><th>Sent To/From</th><th>Amount</th><TH>Time Sent</TH><th>Message</th><th>Sent</th><th>Cancled</th><th>failed</th>
     </tr>
     {% for txid, userId, sentTo, amount, message, timeSent, daktxid, sent, cancled, failed  in transactions %}
     <tr>
