@@ -204,6 +204,7 @@ def transactionInfo(txid):
         return render_template('localTransactInfo.html', **transactInfo)
     else:
         return render_template('remoteTransactInfo.html', **transactInfo)
+
 @app.route('/transactionInfo', methods=['GET', 'POST'])
 def transactionSearch():
     error = None

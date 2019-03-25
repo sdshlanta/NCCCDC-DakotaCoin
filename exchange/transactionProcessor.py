@@ -18,4 +18,4 @@ def processTransactions(db, rpc, logger, delay):
                     tb)
         if any(sent):
             db.markTransactionsAsSent(sent)
-        sleep(delay)
+        sleep(db.getCurentConfig()['transact_interval'])
