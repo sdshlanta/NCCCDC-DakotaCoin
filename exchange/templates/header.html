@@ -9,7 +9,7 @@
 	<body>
 		<div id="header">
 			<div id="title">
-				<a href="{{ url_for('index') }}"><h1>Mt. CCDC</h1></a>
+				<a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/logo.jpg') }}" alt=""></a>
 				<h3>DakotaCoin Exchange</h3>
 			</div>
 			{% if session.logged_in %}
