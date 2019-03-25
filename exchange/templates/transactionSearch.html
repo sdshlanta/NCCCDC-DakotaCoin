@@ -1,0 +1,13 @@
+{% extends "header.html" %}
+{{super()}}
+{% block title %}Mt. CCDC - Transaction Lookup {% endblock %}
+{% block content %}
+{% if error %}
+    <h1>{{ error }}</h1>
+{% endif %}
+<form action="/transactionInfo" method="POST">
+    <label for="txid">TXID:</label>
+    <input type="text" name="txid" id="txid">
+    <input type="submit" value="Lookup">
+</form>
+{% endblock %}

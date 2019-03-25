@@ -204,6 +204,20 @@ def transactionInfo(txid):
         return render_template('localTransactInfo.html', **transactInfo)
     else:
         return render_template('remoteTransactInfo.html', **transactInfo)
+@app.route('/transactionInfo', methods=['GET', 'POST'])
+def transactionSearch():
+    error = None
+    if request.method == 'POST':
+        form = request.form
+        return redirect(url_for('transactionInfo', username=form['TXID']))
+    
+    userInfo = {}
+    if session['logged_in']:
+        userInfo = db.getUserByName(session['username'])
+        userInfo['balance'] = rpc.getBalance(session['username'])
+    userInfo['error'] = error
+
+    return render_template('accountSearch.html', **userInfo)
 
 @app.route('/send', methods=['GET', 'POST'])
 def send():
