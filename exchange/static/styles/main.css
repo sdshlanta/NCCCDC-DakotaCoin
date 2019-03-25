@@ -1,6 +1,8 @@
 #title {
-	float: left;
-	width: 550px;
+	display: flex;
+	flex-direction: row;
+	width: 129px;
+	
 }
 
 h1 {
@@ -19,7 +21,8 @@ h2 {
 
 #loginForm {
 	text-align: right;
-	display: grid;
+	display: flex;
+	flex-direction: row-reverse;
     height: 100px;
 }
 
