@@ -82,7 +82,7 @@ GO
 INSERT users VALUES ('Administrator','Administrator@ccdc.local'),
 					('goat', 'goat@ccdc.local');
 
-INSERT configs VALUES ('username', 'password', '192.168.80.167', 9332, 60);
+INSERT configs VALUES ('username', 'Password1!', 'CA01.ccdc.local', 9332, 60);
 
 
 SELECT * FROM users;
