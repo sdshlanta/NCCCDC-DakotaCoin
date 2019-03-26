@@ -277,7 +277,7 @@ def register():
             session['userid'] = db.getUserByName(username)['id']
             session['logged_in'] = True
 
-            return redirect(url_for('accountInfo', username=session['username']))
+            return redirect(url_for('accountInfo', address=session['username']))
         else:
             error = "Username already registerd"
     if session['logged_in']:
