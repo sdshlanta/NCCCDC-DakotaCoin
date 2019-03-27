@@ -107,7 +107,7 @@ def accountSearch():
     return render_template('accountSearch.html', **userInfo)
 
 @app.route('/account/<username>')
-def accountInfo(username = None):
+def accountInfo(username):
     error = None
     
     try:
@@ -277,7 +277,7 @@ def register():
             session['userid'] = db.getUserByName(username)['id']
             session['logged_in'] = True
 
-            return redirect(url_for('account', username=session['username']))
+            return redirect(url_for('accountInfo', username=username))
         else:
             error = "Username already registerd"
     if session['logged_in']:
