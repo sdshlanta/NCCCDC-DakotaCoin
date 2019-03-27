@@ -267,7 +267,7 @@ def register():
     if request.method == 'POST' and 'email' in request.form:
         username = request.form['NewUsername']
         password = request.form['NewPassword']
-        if not any(db.checkForExistingUser(password)):
+        if not any(db.checkForExistingUser(username)):
             registerUser(username
                         ,password
                         ,request.form['email']
