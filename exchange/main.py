@@ -121,6 +121,7 @@ def accountInfo(username):
         userInfo['balance'] = rpc.getBalance(session['username'])
     try:
         dbTrans = db.getTransactions(userInfo['id'])
+        rpcTrans = []
         for transact in rpc.rpc.listtransactions(username):
             txid = transact['txid']
             
@@ -140,8 +141,8 @@ def accountInfo(username):
                         False,
                         False                        
                     )
-                dbTrans.append(data)
-                
+                rpcTrans.append(data)
+        dbTrans.extend(rpcTrans)   
         userInfo['transactions'] = dbTrans
     except KeyError:
         error = 'The user "%s" does not exist' % username
